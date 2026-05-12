@@ -494,9 +494,14 @@ if predict_button:
 
     summary_df = pd.DataFrame(summary_data)
 
+    summary_df["Value"] = (
+        summary_df["Value"].astype(str)
+    )
+
     st.dataframe(
         summary_df,
-        use_container_width=True
+        width='stretch',
+        hide_index=True
     )
 
 
