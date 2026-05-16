@@ -167,21 +167,27 @@ if predict_button:
 
     if churn_probability >= threshold:
         st.error(f"🚨 High Churn Risk (Probability > {threshold:.2%})")
-        st.markdown("**Retention Strategy Needed:**")
+        st.markdown("**Recommended Next Steps:**")
+        
         if contract == "Month-to-Month":
-            st.info("💡 **Action:** Offer a long-term contract incentive to increase switching costs.")
+            st.info("💡 **Action:** Pitch a 1-year or 2-year contract with a small sign-up discount to lock in commitment.")
+        
         if referrals == 0:
-            st.info("💡 **Action:** Trigger a referral bonus program; referrals are your strongest loyalty anchor.")
+            st.info("💡 **Action:** Invite them to a referral program. Getting them to invite friends is our best way to build loyalty.")
+        
         if monthly_charge > 70:
-            st.info("💡 **Action:** High charges are a primary churn driver. Consider a personalized discount or plan down-sell.")
+            st.info("💡 **Action:** Review their billing. The current rate is a heavy churn driver, so a tailored discount or alternative plan could save them.")
+        
         if dependents == 0:
-            st.info("💡 **Action:** Single-user accounts are high risk. Cross-sell family plans to increase 'account stickiness'.")
+            st.info("💡 **Action:** Suggest an account upgrade. Single users leave easily—cross-selling a multi-user or family plan keeps them around longer.")
+
     elif churn_probability >= (threshold * 0.7):
         st.warning("⚠️ Medium Churn Risk")
-        st.write("Customer shows early signs of churn. Monitor usage patterns.")
+        st.write("This customer is showing early warning signs. Keep an eye on their recent usage trends.")
+        
     else:
         st.success("👌 Low Churn Risk")
-        st.write("Customer is currently stable.")
+        st.write("This account looks healthy and stable.")
 
     st.divider()
 
@@ -204,51 +210,51 @@ if predict_button:
         # Mapping dictionary based on your SHAP summary plots
         explanations = {
             'Number of Referrals': {
-                'pos': f"Low referral activity ({value_dict['Number of Referrals']}) is a top indicator of churn risk.",
-                'neg': "High referral count is a strong sign of customer loyalty and satisfaction."
+                'pos': f"Having few or no referrals ({value_dict['Number of Referrals']}) strongly flags them as a churn risk.",
+                'neg': "They actively refer others, which is a fantastic sign of a loyal promoter."
             },
             'Contract_Two Year': {
-                'pos': "Lack of a long-term (2-year) contract significantly increases churn vulnerability.",
-                'neg': "The stability of a 2-year contract is the primary factor preventing churn."
+                'pos': "Not having a long-term (2-year) contract leaves this account highly unprotected.",
+                'neg': "The solid commitment of a 2-year contract is the biggest reason they are staying."
             },
             'Contract_One Year': {
-                'pos': "The absence of a multi-year commitment increases the risk of switching.",
-                'neg': "The 1-year contract provides a solid foundation for customer retention."
+                'pos': "Without a multi-year agreement, the customer has less reason to stay long-term.",
+                'neg': "The baseline stability of a 1-year contract is actively keeping this account secure."
             },
             'Tenure in Months': {
-                'pos': f"Relatively low tenure ({value_dict['Tenure in Months']} months) makes this customer less 'sticky'.",
-                'neg': "Extensive tenure indicates a highly established and stable relationship."
+                'pos': f"They haven't been with us very long ({value_dict['Tenure in Months']} months), so they haven't built strong brand habits yet.",
+                'neg': "Their extensive history with us makes them an incredibly stable, long-term customer."
             },
             'Monthly Charge': {
-                'pos': f"High monthly charges (${value_dict['Monthly Charge']:.2f}) are creating significant price pressure.",
-                'neg': "Competitive monthly pricing is currently acting as a retention driver."
+                'pos': f"Their high monthly bill (${value_dict['Monthly Charge']:.2f}) is creating heavy price frustration.",
+                'neg': "They are getting a highly competitive monthly rate, which makes them want to stay."
             },
             'AvgChargePerService': {
-                'pos': "High average cost per service is reducing the perceived value for this customer.",
-                'neg': "Excellent value-per-service is encouraging the customer to stay."
+                'pos': "The average cost per individual service feels too high, lowering their perceived value.",
+                'neg': "They are getting excellent value across their bundled services, keeping them happy."
             },
             'Paperless Billing': {
-                'pos': "Customers using paperless billing in this segment show a higher tendency to churn.",
-                'neg': "Traditional billing preferences are correlating with higher stability for this user."
+                'pos': "Our data shows paperless billing users in this segment have a noticeably higher tendency to leave.",
+                'neg': "Their traditional billing setup aligns perfectly with our most stable customer habits."
             },
             'Number of Dependents': {
-                'pos': "Lack of dependents on the account is associated with higher customer mobility.",
-                'neg': "Stronger family/dependent ties to the account increase overall 'stickiness'."
+                'pos': "Single-user accounts or those without listed dependents find it much easier to walk away.",
+                'neg': "Having family or multiple dependents tied to the account adds strong roots to their plan."
             },
             'Internet Type_Fiber Optic': {
-                'pos': "Fiber Optic users are experiencing higher churn, possibly due to pricing or competition.",
-                'neg': "Fiber Optic service quality is currently supporting this customer's loyalty."
+                'pos': "Fiber Optic subscribers are leaving at higher rates, likely due to pricing or local competition.",
+                'neg': "Our Fiber Optic service quality is keeping them happy and loyal."
             },
             'TenureGroup_New': {
-                'pos': "As a 'New' customer (first 12 months), the risk of early-stage churn is elevated.",
-                'neg': "Moving out of the 'New' customer phase has improved stability."
+                'pos': "Being in their very first year makes them highly susceptible to early-stage cancellation.",
+                'neg': "Crossing the critical 12-month milestone has made them a much safer, more secure account."
             },
             'Payment Method_Credit Card': {
-                'pos': "Manual or non-automated credit card payments show a slight correlation with churn.",
-                'neg': "Automated credit card billing is supporting consistent customer retention."
+                'pos': "Relying on manual or non-automated credit card payments shows a slight tie to customer drop-off.",
+                'neg': "Having automated credit card payments keeps their account clear and consistently active."
             }
         }
-
+        
         if feature in explanations:
             return explanations[feature]['pos'] if is_positive else explanations[feature]['neg']
         
@@ -256,12 +262,12 @@ if predict_button:
         
         if "Yes" in feature or "Internet Service" in feature:
             if is_positive:
-                return f"The status or absence of {readable_name} is contributing to churn risk."
+                return f"The current setup or lack of {readable_name} is pushing this customer toward leaving."
             else:
-                return f"Usage of {readable_name} is helping to anchor the customer."
+                return f"Active use of {readable_name} is one of the main reasons they are staying."
 
-        direction = "increased churn risk" if is_positive else "supported retention"
-        return f"{readable_name} {direction}."
+        direction = "is driving up their churn risk" if is_positive else "is helping keep this account stable"
+        return f"The customer's {readable_name} {direction}."
 
     exp_col1, exp_col2 = st.columns(2)
     
@@ -322,6 +328,7 @@ with st.expander("View Model Technical Specifications"):
     * **Model:** CatBoost Classifier
     * **ROC-AUC:** 90.54%
     * **Recall:** 79.36%
+    * **Accuracy:** 82.21%
     * **Optimized Threshold:** `{threshold:.4f}`
     * **Strategy:** Threshold-moving to prioritize early detection (Recall).
     """)
